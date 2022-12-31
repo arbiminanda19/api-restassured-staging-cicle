@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.json.simple.JSONObject;
+import org.testng.Assert;
 
 import static io.restassured.RestAssured.given;
 
@@ -40,6 +41,7 @@ public class companyHelper {
                 .response();
 
         JsonPath responseParsed = response.jsonPath();
+        Assert.assertEquals(responseParsed.getString("message"), "Successfully create company user");
         companyId = responseParsed.getString("newCompany._id");
         return companyId;
 
@@ -58,6 +60,9 @@ public class companyHelper {
                 .statusCode(200)
                 .extract()
                 .response();
+
+        String responseString = response.toString();
+        Assert.assertFalse(responseString.contains(companyId));
 
     }
 
