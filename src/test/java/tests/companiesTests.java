@@ -3,6 +3,7 @@ package tests;
 import baseUrl.v1;
 import data.dataCompanies;
 import helper.accessFile;
+import helper.companyHelper;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -20,6 +21,7 @@ public class companiesTests {
     String companyName = "";
 
     dataCompanies dataCompanies = new dataCompanies();
+    companyHelper companyHelper = new companyHelper();
     v1 baseUrl = new v1();
     accessFile accessFile = new accessFile();
     String file_token = "src/test/resources/data/token.txt";
@@ -33,25 +35,7 @@ public class companiesTests {
     @Test(priority = 1)
     public void createCompany() {
 
-        JSONObject payload = dataCompanies.createCompany();
-
-        companyName = (String) payload.get("name");
-
-        Response response = given()
-                .when()
-                .header("Content-Type", "application/json")
-                .header("Authorization", token)
-                .body(payload.toJSONString())
-                .post("/companies")
-                .then()
-                .log().body()
-                .statusCode(200)
-                .extract()
-                .response();
-
-        JsonPath responseParsed = response.jsonPath();
-        Assert.assertEquals(responseParsed.getString("message"), "Successfully create company user");
-        companyId = responseParsed.getString("newCompany._id");
+        companyId = companyHelper.getNewCompanyId();
 
     }
 
@@ -106,19 +90,7 @@ public class companiesTests {
     @Test(priority = 4)
     public void deleteCompany() {
 
-        Response response = given()
-                .when()
-                .header("Content-Type", "application/json")
-                .header("Authorization", token)
-                .delete("/companies/" + companyId)
-                .then()
-                .log().body()
-                .statusCode(200)
-                .extract()
-                .response();
-
-        String responseString = response.toString();
-        Assert.assertFalse(responseString.contains(companyId));
+        companyHelper.deleteCompany(companyId);
 
     }
 
